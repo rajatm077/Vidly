@@ -5,9 +5,9 @@ const bcrypt  = require('bcrypt');
 const Joi     = require('joi');
 
 const { User } = require('../models/user');
+const asyncMiddleware = require('../middleware/async');
 
-router.post('/', async (req, res) => {
-  try {
+router.post('/', asyncMiddleware(async (req, res) => {
     const { error } = validate(req.body);
     if (error) 
       return res.status(400).send(error.details[0].message);
@@ -22,13 +22,7 @@ router.post('/', async (req, res) => {
 
     const token = user.generateAuthToken();
     res.send(token);
-
-  } catch (err) {
-    console.log('Error at auth.js: ', err.message);
-  }  
-
-
-});
+}));
 
 function validate(req) {
   const schema = {

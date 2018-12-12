@@ -3,22 +3,22 @@ const { Genre } = require('../models/genre');
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const asyncMiddleware = require('../middleware/async');
 
-
-router.get('/', async (req, res) => {
+router.get('/', asyncMiddleware(async (req, res) => {
   const movies = await Movie.find().sort({ name: 1});  
   res.send(movies);
-});
+}));
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', asyncMiddleware(async (req, res) => {
   const movie = await Movie.findById(req.params.id);
   
   if (!movie) return res.status(404).send('Movies not found!');
 
   res.send(movie);
-});
+}));
 
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, asyncMiddleware(async (req, res) => {
   const { error } = validate(req.body);
 
   if (error) return res.status(400).send(error.details[0].message);
@@ -38,9 +38,9 @@ router.post('/', auth, async (req, res) => {
 
   movie = await movie.save();
   res.send(movie);
-});
+}));
 
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', auth, asyncMiddleware(async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   
@@ -50,14 +50,14 @@ router.put('/:id', auth, async (req, res) => {
   
   if (!movie) return res.status(404).send('Movies not found!');
   res.send(Movies);
-});
+}));
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, asyncMiddleware(async (req, res) => {
   const movie = await Movie.findByIdAndDelete(req.params.id);
   
   if (!movie) return res.status(404).send('Movies not found!');
 
   res.send(movie);  
-});
+}));
 
 module.exports = router;

@@ -5,14 +5,14 @@ const bcrypt  = require('bcrypt');
 const auth    = require('../middleware/auth');
 
 const { User, validate } = require('../models/user');
+const asyncMiddleware = require('../middleware/async');
 
-router.get('/me', auth, async (req, res) => {
+router.get('/me', auth, asyncMiddleware(async (req, res) => {
   const user = await User.findById(req.user._id).select({ password: 0 });
   res.send(user);
-});
+}));
 
-router.post('/', async (req, res) => {
-  try {
+router.post('/', asyncMiddleware(async (req, res) => {
     const { error } = validate(req.body);
     if (error) return res.status(400).send(error.details[0].message);
    
@@ -28,11 +28,7 @@ router.post('/', async (req, res) => {
     
     const token = user.generateAuthToken();
     res.header('x-auth-token', token)
-       .send(_.pick(user, ['name', 'email']));
-
-  } catch (err) {
-    console.log(`User Post / :  ${err.message}`);
-  }  
-});
+       .send(_.pick(user, ['name', 'email']));   
+}));
 
 module.exports = router;

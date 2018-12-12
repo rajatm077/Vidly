@@ -3,6 +3,7 @@ const customers = require('./routes/customers');
 const movies    = require('./routes/movies');
 const users     = require('./routes/users');
 const auth      = require('./routes/auth');
+const error      = require('./middleware/error');
 
 const config    = require('config');
 const helmet    = require('helmet');
@@ -25,8 +26,12 @@ app.use('/api/users', users);
 app.use('/api/auth', auth);
 
 app.get('/', (req, res) => {
+  throw new Error('check');
   res.send('Welcome to Vidly!');
 });
+
+// Always use error middleware at the end.
+app.use(error);
 
 const port = process.env.PORT || 8080;
 app.listen(8080, () => {
